@@ -1,0 +1,45 @@
+var express = require('express');
+var bodyParser  = require('body-parser');
+
+var app = express();
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use('/', express.static('../', {maxage: 60*60*24*1000}));
+app.use('/images', express.static( '../resources/images'));
+
+app.get('/', function(req, res){
+    res.redirect('../first.html');
+});
+
+function initStore(){
+    var items = ['eggs', 'toast', 'bacon', 'juice'];
+    var storeObj = {};
+    for (var itemIDX in items){
+        storeObj[items[itemIDX]] =
+            Math.floor(Math.random() * 10 + 1);
+    }
+    return storeObj;
+}
+
+app.get('/reset/data', function(req, res){
+    console.log("Reset called ...")
+    storeItems = initStore();
+    console.log("Restocked"+storeItems);
+    res.json(storeItems);
+});
+
+app.post('/buy/item', function(req, res){
+    var order = Math.floor(Math.random() * 5 + 1);
+    console.log("Reorder Item :"+req.body.item+" ### Qty :"+order);
+    if (storeItems[req.body.item] > order){
+        storeItems[req.body.item] =
+            storeItems[req.body.item] - order;
+        res.json(storeItems[req.body.item]);
+    }else {
+        res.json(400, { msg: 'Sorry ' + req.body.item +
+        ' is out of stock.' });
+    }
+});
+
+app.listen(8080);

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html ng-app="firstApp">
+<style>
+    .names{
+        padding: 3px; border: 3px ridge;
+        cursor: pointer; width: 100px; display: inline-block;
+        font: bold 18px/22px Georgia; text-align: center;
+        color: white; background-color: blue }
+    label{
+        padding: 2px; margin: 5px 10px; font: 15px bold;
+        display: inline-block; width: 50px; text-align: right; }
+    .lList {
+        vertical-align: top;
+        display: inline-block; width: 130px; }
+    .cInfo {
+        display: inline-block; width: 175px;
+        border: 3px blue ridge; padding: 3px; }
+    p{
+        padding: 3px;
+        color: darkred; background-color: white;
+    }
+    .a1{
+        padding: 5px;
+        color: blue; cursor: pointer;
+    }
+</style>
+
+<head>
+<title>All AngularJS Apps</title>
+</head>
+<body>
+<h2>Service Example</h2>
+<div ng-controller="LibraryService">
+    Enter Book: <input type="text" ng-model="book" />
+    <br>
+    <button ng-click='findBorrow()' >Find</button>
+    <hr><hr>
+</div>
+<div ng-controller="FirstService">
+    <input type="button" value="Reset" ng-click="restock()"/><p>{{restockStatus}}{{getItemStatus}}</p>
+    <div class="myList">
+        <h3>Store</h3>
+        <div ng-repeat="(item, count) in storeItems">{{item}}-{{count}}[<span class="a1" ng-click="reorder(item)">Buy</span>]</div>
+        <hr>
+        <h3>Shelf</h3>
+        <div id="s1" ng-repeat="(item, count) in shelfItems">{{item}}-{{count}}[<span class="a1" ng-click="useItem(item)">Use</span>][<span class="a1" ng-click="getItem(item)">Restock</span>]</div>
+    </div>
+</div>
+<hr><hr>
+<div ng-controller="FirstController">
+<span>Name:</span>
+ <input type="text" ng-model="first" ng-blur="focusLost($event, 'input1')" ng-focus="focusGot('input1')" ng-keyDown="keyState='Key Pressed'" ng-keyUp="keyState='Key Released'; keyPress($event)" >
+ <input type="text" ng-model="last"  ng-blur="focusLost($event, 'input2')" ng-focus="focusGot('input2')">
+ <button ng-click='updateMessage()'>Message</button>
+ <hr>
+ {{heading + message}}<br>
+ FocusOn: {{inputData|json}}<br>
+ <span>Key State: {{keyState}}</span>
+ <span>Key Strokes: {{keyStrokes}}</span>
+ </div>
+<hr>
+<hr>
+<div ng-controller="SumController"> Counter App
+    <span>Current Value: {{current}}</span>
+    <button ng-click='inc()'>+</button>
+    <button ng-click='dec()'>-</button>
+    <hr>
+    <span>Difference: {{difference}}</span>
+</div>
+<hr><hr>
+<div ng-controller="MathController">
+    <span>Array : {{growArr}}</span><br>
+    Removed : {{shrinkArr}}
+    <a ng-click="growArr.push(Math.floor(Math.random()*100 + 1))"> Click to insert into Array</a><br>
+    <a ng-click="shrinkArr.push(growArr.shift())"> Click to remove first element</a><br>
+</div>
+<hr><hr>
+<div ng-controller="PlaneController">
+    <input type="text" ng-model="filterString"/>
+    <input type="button" ng-click="setfilter()" value="Filter"/>
+    <table>
+        <tr>
+            <th ng-click="setSort('make')">Make</th>
+            <th ng-click="setSort('model')">Model</th>
+            <th ng-click="setSort('capacity')">Capacity</th>`
+        </tr>
+        <tr ng-repeat="plane in filteredPlanes | orderBy:column:reverse">
+            <td>{{plane.make}}</td>
+            <td>{{plane.model}}</td>
+            <td>{{plane.capacity}}</td>
+        </tr>
+    </table>
+</div>
+<div ng-controller="ColorController">
+    <hr><hr>
+    Select Color :
+    <span ng-repeat="mcolr in colors">
+        <button ng-style="{color: mcolr}" ng-click="changeColor(mcolr)">{{mcolr}}</button>
+    </span>
+    <br>
+    <span>Hits: {{hits}}</span><button ng-click="hit()">+</button> <span>Misses: {{misses}}</span><button ng-click="miss()">-</button>
+    <br>
+    Change: <input type="text"  ng-model="changeCount"/>
+    <br>Selection: <span>{{myColor|json}}</span>
+</div>
+<hr><hr>
+<div ng-controller="Races">
+<div class="IList" ng-repeat="name in names"><span class="names" ng-click="changePerson()">{{name}}</span></div>
+    <div class="cInfo">
+        <span ng-controller="Character">
+            <label>Name: </label>{{person}}<br>
+            <label>Race: </label>{{currentInfo.race}}<br>
+            <label>Weapon: </label>{{currentInfo.weapon}}<br>
+            <span class="names" ng-click="deleteChar()">Delete</span>
+        </span>
+    </div>
+</div>
+<script src="http://code.angularjs.org/1.3.8/angular.min.js"></script>
+ <script src="../js/first.js"></script>
+</body>
+</html>
