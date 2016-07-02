@@ -126,7 +126,7 @@ firstApp.controller('Races', function($scope){
        var i = $scope.names.indexOf(removedName);
         $scope.names.splice(i,1);
         $scope.person = $scope.names[0];
-        $scope.$broadcast('CharacterChanged', this.name);
+        $scope.$broadcast('CharacterChanged', $scope.person);
     });
 }).controller('Character', function($scope){
     $scope.info = {'Frodo': { weapon: 'Sting',
@@ -215,15 +215,19 @@ firstApp.controller('LibraryService', ['$scope', '$http', function($scope, $http
     $scope.book = '';
     $scope.bookid = '';
     $scope.cost = '';
+    $scope.authr = '';
     $scope.fullString = '';
     $scope.findBorrow = function(){
         console.log($scope.book);
         $http.get('/findborrow/'+$scope.book)
             .success(function(data, status, headers, config) {
-
-                $scope.bookid = (JSON.parse(data.info)).bookId;
-                $scope.cost = (JSON.parse(data.info)).price;
+                
                 $scope.fullString = JSON.parse(data.info);
+                $scope.bookid = $scope.fullString[0].bookId;
+                $scope.cost = '$'+$scope.fullString[0].costPerday;
+                $scope.authr = $scope.fullString[0].author;
+
+                console.log($scope.fullString[0]);
                 console.log($scope.fullString[0].bookId);
 
             })
