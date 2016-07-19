@@ -5,16 +5,17 @@
     'use strict';
     var express = require('express');
     var app = express();
+    var passport = require('passport');
 
-    require('./config/config_app')(app);
-    //require('./config/config_routes')(app);
-    require('./js/module_routes')(app);
+    require('./js/localauth')(passport);
+    require('./config/config_app')(app, passport);
+    require('./js/module_routes')(app, passport);
 
 
     // START THE SERVER
     console.log('STARTING THE TST SERVER');
     console.log('-------------------------');
-    app.listen(3000);
+    app.listen(3005);
     console.log('Started the server');
     process.on('uncaughtException', function (error) {
         console.log(error.stack);

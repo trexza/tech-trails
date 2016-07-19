@@ -4,6 +4,10 @@ var passport = require('passport');
 console.log("Auth Example : Going to load Strategy modules ...");
 var Strategy = require('passport-google-oauth20').Strategy;
 
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/test_session');
+userSession = require('./models/Usersession');
+
 
 // Configure the Facebook strategy for use by Passport.
 //
@@ -26,7 +30,22 @@ passport.use(new Strategy({
     // be associated with a user record in the application's database, which
     // allows for account linking and authentication with other identity
     // providers.
+    console.log("Access Token :"+accessToken);
+    console.log("Refresh Token :"+refreshToken);
+
     //User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      var session = new userSession({
+          userId: profile.id,
+          username: profile.displayName,
+          accessId: accessToken,
+          created_at: new Date()
+      });
+      console.log('Going to save user..');
+      session.save(function(err) {
+          if (err) throw err;
+
+          console.log('User session saved successfully!');
+      });
       return cb(null, profile);
     //});
   }));
@@ -62,7 +81,7 @@ app.set('view engine', 'ejs');
 app.use(require('morgan')('combined'));
 app.use(require('cookie-parser')());
 app.use(require('body-parser').urlencoded({ extended: true }));
-app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
+app.use(require('express-session')({ secret: 'MAGICString', resave: false, saveUninitialized: true, cookie : { maxAge: 300000 }}));
 
 // Initialize Passport and restore authentication state, if any, from the
 // session.
@@ -77,21 +96,25 @@ app.get('/',
     res.render('home', { user: req.user });
   });
 
-app.get('/login',
+/*app.get('/login',
   function(req, res){
     console.log("Auth example : Calling GET:/login ...");
     res.render('login');
-  });
+  });*/
 
 console.log("Auth example : Calling Authenticate ...")
 app.get('/login/google',
     passport.authenticate('google', { scope: ['profile'] }));
 
 app.get('/login/google/return',
-  passport.authenticate('google', { failureRedirect: '/login' }),
-  function(req, res) {
+  //passport.authenticate('google', { successRedirect: 'http://localhost:3005/authComplete', failureRedirect: 'http://localhost:3005/' })
+    passport.authenticate('google', { failureRedirect: 'http://localhost:3005/' }), function(req, res) {
       console.log("Auth example : Calling GET:/login/google/return (callback) ...");
-    res.redirect('/');
+      console.log("User Session started for :"+req.user.displayName);
+      console.log(req.cookies);
+      res.cookie('user', req.user.displayName);
+      res.cookie('connect.sid', req.cookies["connect.sid"]);
+      res.redirect("http://localhost:3005/authComplete");
   });
 
 app.get('/profile',

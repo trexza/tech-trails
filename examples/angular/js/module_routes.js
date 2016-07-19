@@ -3,11 +3,63 @@ var http = require('http');
 var request = require('request');
 //var app = require('express')();
 
-module.exports = function(app) {
+module.exports = function(app, passport) {
+
+    app.get('/', function(req, res){
+        console.log("User Session:"+req.sessionID);
+        res.redirect('../first.html');
+    });
+
+
+    /*app.get('/authComplete',
+     passport.authenticate('local', { failureRedirect: '/login', successRedirect: '../first.html' }), function(req, res) {
+     console.log("In Passport.authenticate callback ..");
+     if (req.user) {
+     console.log("User Authenticated :" + req.user);
+     }
+     res.redirect('../first.html');
+     });*/
+
+    app.get('/authComplete', function (req, res, next) {
+        passport.authenticate('local', { failureRedirect: '/login', successRedirect: '../first.html' }, function (err, user, info) {
+            if (err) {
+                console.log('Oops. Something broke!');
+            } else if (info) {
+                console.log( 'unauthorized');
+            } else {
+                req.login(user, function(err) {
+                    if (err) {
+                        console.log( 'Login Error');
+                        res.write("Error ");
+                    } else {
+                        console.log( 'Logged in ');
+                        res.redirect('/');
+                    }
+                })
+            }
+        })(req, res, next);
+    });
+
+    app.get('/login', function(req, res) {
+        res.render('login');
+    });
+
+    app.get('/logout', function(req, res){
+        req.logout();
+        req.session.destroy(function(){
+            res.redirect('/login');
+        });
+    });
+
+    /*app.get('/profile',
+        require('connect-ensure-login').ensureLoggedIn(),
+        function(req, res){
+            res.render('profile', { user: req.user });
+        });
 
     app.get('/', function (req, res) {
         res.redirect('../first.html');
-    });
+    });*/
 
     function initStore() {
         var items = ['eggs', 'toast', 'bacon', 'juice'];
